@@ -17,10 +17,10 @@ public static class CreateOrder
 
     [ProducesResponseType(typeof(OrderDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    private static async Task<Results<Created<OrderDto>, BadRequest<string>>> HandleAsync(
+    public static async Task<Results<Created<OrderDto>, BadRequest<string>>> HandleAsync(
         [FromBody] CreateOrderRequest request,
         RelexDbContext db,
-        LookupCache cache,
+        ILookupCache cache,
         CancellationToken ct)
     {
         // Simple Guard Clauses (Built-in Validation)

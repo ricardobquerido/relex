@@ -4,12 +4,18 @@ using Relex.Domain;
 
 namespace Relex.Api.Infrastructure;
 
+public interface ILookupCache
+{
+    short? GetLocationId(string code);
+    int? GetProductId(string code);
+}
+
 /// <summary>
 /// A high-performance, thread-safe cache for dimension lookups.
 /// In high-scale systems, dimensions (Products, Locations) are relatively small and static
 /// compared to the Fact table (Orders). Caching them eliminates millions of DB roundtrips.
 /// </summary>
-public class LookupCache
+public class LookupCache : ILookupCache
 {
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ConcurrentDictionary<string, short> _locations = new();

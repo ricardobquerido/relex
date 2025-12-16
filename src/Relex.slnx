@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Relex.Domain/Relex.Domain.csproj" />
+  <Project Path="Relex.Tests/Relex.Tests.csproj" />
+</Solution>

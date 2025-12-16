@@ -17,7 +17,7 @@ public static class GetOrder
 
     [ProducesResponseType(typeof(OrderDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    private static async Task<Results<Ok<OrderDto>, NotFound>> HandleAsync(
+    public static async Task<Results<Ok<OrderDto>, NotFound>> HandleAsync(
         [FromRoute] Guid id,
         RelexDbContext db,
         CancellationToken ct)

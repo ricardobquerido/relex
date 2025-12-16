@@ -33,6 +33,7 @@ builder.Services.AddDbContext<RelexDbContext>(options =>
 
 // Optimization: Singleton Cache
 builder.Services.AddSingleton<LookupCache>();
+builder.Services.AddSingleton<ILookupCache>(sp => sp.GetRequiredService<LookupCache>());
 
 // Health Checks
 builder.Services.AddHealthChecks()

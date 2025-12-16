@@ -17,7 +17,7 @@ public static class DeleteOrder
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    private static async Task<Results<NoContent, NotFound, BadRequest<string>>> HandleAsync(
+    public static async Task<Results<NoContent, NotFound, BadRequest<string>>> HandleAsync(
         [FromRoute] Guid id,
         RelexDbContext db,
         CancellationToken ct)
