@@ -34,6 +34,7 @@ CREATE TABLE orders (
     quantity INT NOT NULL CHECK (quantity > 0),
     submitted_by TEXT NOT NULL,
     submitted_at TIMESTAMPTZ NOT NULL,
+    status INT NOT NULL DEFAULT 0,
     PRIMARY KEY (order_date, id)
 ) PARTITION BY RANGE (order_date);
 

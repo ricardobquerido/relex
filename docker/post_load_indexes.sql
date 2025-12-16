@@ -24,5 +24,9 @@ INCLUDE (product_id, quantity, submitted_at);
 CREATE INDEX IF NOT EXISTS idx_orders_product_brin
 ON orders USING BRIN (product_id);
 
+-- Filter by Status (e.g. for workflow or analytics)
+CREATE INDEX IF NOT EXISTS idx_orders_status
+ON orders (status);
+
 -- Update planner statistics
 ANALYZE orders;

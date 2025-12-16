@@ -57,7 +57,7 @@ echo "Loading orders (partitioned fact table)..."
 
 for file in parts/*.csv; do
   copy_csv "$file" "orders" \
-    "id,location_id,product_id,order_date,quantity,submitted_by,submitted_at"
+    "id,location_id,product_id,order_date,quantity,submitted_by,submitted_at,status"
 done
 
 echo "Creating indexes and updating planner statistics..."

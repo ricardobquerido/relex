@@ -62,7 +62,7 @@ def random_submitted_at(order_date: date) -> datetime:
 
 def generate_row():
     order_date = random_order_date()
-    # Schema: id, location_id, product_id, order_date, quantity, submitted_by, submitted_at
+    # Schema: id, location_id, product_id, order_date, quantity, submitted_by, submitted_at, status
     return [
         str(uuid.uuid4()),
         random.randint(1, LOCATION_COUNT),
@@ -70,7 +70,8 @@ def generate_row():
         order_date.isoformat(),
         random.randint(1, 100),
         SUBMITTED_BY,
-        random_submitted_at(order_date).isoformat()
+        random_submitted_at(order_date).isoformat(),
+        random.randint(0, 3) # Status: 0=Pending, 1=Confirmed, 2=Shipped, 3=Cancelled
     ]
 
 # ------------------------------------------------------------
