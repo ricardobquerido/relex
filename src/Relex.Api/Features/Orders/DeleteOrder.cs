@@ -14,6 +14,16 @@ public static class DeleteOrder
            .WithName("DeleteOrder");
     }
 
+    /// <summary>
+    /// Deletes an existing order.
+    /// </summary>
+    /// <remarks>
+    /// Only "Pending" orders can be deleted. Past orders cannot be deleted.
+    /// </remarks>
+    /// <param name="id">The unique identifier of the order to delete.</param>
+    /// <param name="db">Database context.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>No content if successful.</returns>
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

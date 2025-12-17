@@ -18,6 +18,9 @@ public static class ListOrders
     /// <summary>
     /// Retrieves a paged list of orders.
     /// </summary>
+    /// <remarks>
+    /// Supports filtering by location, date range, and pagination. Returns orders sorted by date descending.
+    /// </remarks>
     /// <param name="db">Database context.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <param name="locationCode">Optional. Filter by Location Code.</param>

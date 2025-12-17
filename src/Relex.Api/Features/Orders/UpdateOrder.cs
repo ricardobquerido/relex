@@ -15,6 +15,17 @@ public static class UpdateOrder
            .WithName("UpdateOrder");
     }
 
+    /// <summary>
+    /// Updates an existing order.
+    /// </summary>
+    /// <remarks>
+    /// Allows modifying quantity and status. Updates the SubmittedAt timestamp.
+    /// </remarks>
+    /// <param name="id">The unique identifier of the order to update.</param>
+    /// <param name="request">The update details.</param>
+    /// <param name="db">Database context.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>No content if successful.</returns>
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -36,9 +47,15 @@ public static class UpdateOrder
             return TypedResults.BadRequest($"Invalid status: {request.Status}. Valid values are: {string.Join(", ", Enum.GetNames<OrderStatus>())}");
         }
 
-        // TODO: need the partition key (OrderDate) in the request URL or body to avoid scanning all partitions 
-        var order = await db.Orders
-            .FirstOrDefaultAsync(o => o.Id == id, ct);
+        // Optimized Lookup: Use Partition Key (OrderDate) if provided to prune partitions
+        var query = db.Orders.AsQueryable();
+
+        if (request.OrderDate.HasValue)
+        {
+            query = query.Where(o => o.OrderDate == request.OrderDate.Value);
+        }
+
+        var order = await query.FirstOrDefaultAsync(o => o.Id == id, ct);
 
         if (order is null)
         {

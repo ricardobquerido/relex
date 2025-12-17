@@ -16,4 +16,10 @@ public record UpdateOrderRequest
     /// </summary>
     /// <example>Confirmed</example>
     public string? Status { get; init; }
+
+    /// <summary>
+    /// Optional: The Order Date (Partition Key). Providing this avoids scanning all partitions.
+    /// </summary>
+    /// <example>2023-01-01</example>
+    public DateOnly? OrderDate { get; init; }
 }

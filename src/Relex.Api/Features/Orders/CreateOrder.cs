@@ -15,6 +15,17 @@ public static class CreateOrder
            .WithName("CreateOrder");
     }
 
+    /// <summary>
+    /// Creates a new replenishment order.
+    /// </summary>
+    /// <remarks>
+    /// Validates the request against cached locations and products before creating the order.
+    /// </remarks>
+    /// <param name="request">The order creation request containing quantity, codes, and metadata.</param>
+    /// <param name="db">Database context.</param>
+    /// <param name="cache">Lookup cache for validation.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created order DTO.</returns>
     [ProducesResponseType(typeof(OrderDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public static async Task<Results<Created<OrderDto>, BadRequest<string>>> HandleAsync(

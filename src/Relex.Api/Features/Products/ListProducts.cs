@@ -15,6 +15,15 @@ public static class ListProducts
            .WithName("ListProducts");
     }
 
+    /// <summary>
+    /// Retrieves a list of all available products.
+    /// </summary>
+    /// <remarks>
+    /// Returns a lightweight list of product codes and IDs.
+    /// </remarks>
+    /// <param name="db">Database context.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>List of products.</returns>
     [ProducesResponseType(typeof(List<ProductDto>), StatusCodes.Status200OK)]
     private static async Task<Ok<List<ProductDto>>> HandleAsync(
         RelexDbContext db,

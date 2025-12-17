@@ -15,6 +15,18 @@ public static class GetOrderStats
            .WithName("GetOrderStats");
     }
 
+    /// <summary>
+    /// Calculates aggregate statistics for orders.
+    /// </summary>
+    /// <remarks>
+    /// Provides totals and averages based on optional filters for location and date range.
+    /// </remarks>
+    /// <param name="db">Database context.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <param name="locationCode">Optional filter by location code.</param>
+    /// <param name="startDate">Optional start date (inclusive).</param>
+    /// <param name="endDate">Optional end date (inclusive).</param>
+    /// <returns>Statistical summary of orders.</returns>
     [ProducesResponseType(typeof(OrderStatsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     private static async Task<Results<Ok<OrderStatsResponse>, BadRequest<string>>> HandleAsync(

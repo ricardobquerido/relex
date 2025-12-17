@@ -15,6 +15,15 @@ public static class ListLocations
            .WithName("ListLocations");
     }
 
+    /// <summary>
+    /// Retrieves a list of all available locations.
+    /// </summary>
+    /// <remarks>
+    /// Returns a lightweight list of location codes and IDs.
+    /// </remarks>
+    /// <param name="db">Database context.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>List of locations.</returns>
     [ProducesResponseType(typeof(List<LocationDto>), StatusCodes.Status200OK)]
     private static async Task<Ok<List<LocationDto>>> HandleAsync(
         RelexDbContext db,
