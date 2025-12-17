@@ -253,6 +253,42 @@ public class OrderUnitTests
     }
 
     [Fact]
+    public async Task UpdateOrder_WithPartitionKey_ReturnsNoContentAndUpdatesDB()
+    {
+        // Arrange
+        var orderId = Guid.NewGuid();
+        var date = new DateOnly(2023, 5, 20);
+        var existingOrder = new Order
+        {
+            Id = orderId,
+            OrderDate = date,
+            Status = OrderStatus.Pending,
+            LocationId = 1,
+            ProductId = 1,
+            Quantity = 10,
+            SubmittedBy = "User",
+            SubmittedAt = DateTimeOffset.UtcNow
+        };
+        _db.Orders.Add(existingOrder);
+        await _db.SaveChangesAsync();
+
+        var request = new UpdateOrderRequest 
+        { 
+            Quantity = 99, 
+            OrderDate = date 
+        };
+
+        // Act
+        var result = await UpdateOrder.HandleAsync(orderId, request, _db, CancellationToken.None);
+
+        // Assert
+        result.Result.Should().BeOfType<NoContent>();
+        
+        var updatedOrder = await _db.Orders.FirstOrDefaultAsync(o => o.Id == orderId);
+        updatedOrder!.Quantity.Should().Be(99);
+    }
+
+    [Fact]
     public async Task GetOrder_NotFound_ReturnsNotFound()
     {
         // Act

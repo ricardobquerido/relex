@@ -79,4 +79,25 @@ public class OrderTests : IClassFixture<IntegrationTestWebAppFactory>
         var getAfterDelete = await _client.GetAsync($"/orders/{orderId}");
         getAfterDelete.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
+
+    [Fact]
+    public async Task BulkInsert_IntegrationTest()
+    {
+        var bulkRequest = new[]
+        {
+            new CreateOrderRequest { LocationCode = "LOC-0001", ProductCode = "PROD-00001", OrderDate = new DateOnly(2023, 6, 1), Quantity = 100, SubmittedBy = "BulkTest" },
+            new CreateOrderRequest { LocationCode = "LOC-0001", ProductCode = "PROD-00002", OrderDate = new DateOnly(2023, 6, 1), Quantity = 200, SubmittedBy = "BulkTest" },
+            new CreateOrderRequest { LocationCode = "LOC-0002", ProductCode = "PROD-00001", OrderDate = new DateOnly(2023, 6, 2), Quantity = 300, SubmittedBy = "BulkTest" }
+        };
+
+        var response = await _client.PostAsJsonAsync("/orders/bulk", bulkRequest);
+        
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var message = await response.Content.ReadAsStringAsync();
+        message.Should().Contain("Inserted: 3");
+
+        // Verify one of them exists via standard API
+        var listResponse = await _client.GetFromJsonAsync<ListOrdersResponse>("/orders?pageSize=100");
+        listResponse!.Data.Should().Contain(o => o.SubmittedBy == "BulkTest" && o.Quantity == 200);
+    }
 }
