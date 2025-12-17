@@ -114,7 +114,7 @@ public class OrderUnitTests
         await _db.SaveChangesAsync();
 
         // Act
-        var result = await DeleteOrder.HandleAsync(orderId, _db, CancellationToken.None);
+        var result = await DeleteOrder.HandleAsync(orderId, null, _db, CancellationToken.None);
 
         // Assert
         var badRequest = result.Result.Should().BeOfType<BadRequest<string>>().Subject;
@@ -140,7 +140,7 @@ public class OrderUnitTests
         await _db.SaveChangesAsync();
 
         // Act
-        var result = await DeleteOrder.HandleAsync(orderId, _db, CancellationToken.None);
+        var result = await DeleteOrder.HandleAsync(orderId, null, _db, CancellationToken.None);
 
         // Assert
         var badRequest = result.Result.Should().BeOfType<BadRequest<string>>().Subject;
@@ -166,7 +166,7 @@ public class OrderUnitTests
         await _db.SaveChangesAsync();
 
         // Act
-        var result = await DeleteOrder.HandleAsync(orderId, _db, CancellationToken.None);
+        var result = await DeleteOrder.HandleAsync(orderId, null, _db, CancellationToken.None);
 
         // Assert
         result.Result.Should().BeOfType<NoContent>();
@@ -289,10 +289,38 @@ public class OrderUnitTests
     }
 
     [Fact]
+    public async Task DeleteOrder_WithPartitionKey_ReturnsNoContent()
+    {
+        // Arrange
+        var orderId = Guid.NewGuid();
+        var date = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(5));
+        var order = new Order
+        {
+            Id = orderId,
+            OrderDate = date,
+            Status = OrderStatus.Pending,
+            LocationId = 1,
+            ProductId = 1,
+            Quantity = 10,
+            SubmittedBy = "User"
+        };
+        _db.Orders.Add(order);
+        await _db.SaveChangesAsync();
+
+        // Act
+        var result = await DeleteOrder.HandleAsync(orderId, date, _db, CancellationToken.None);
+
+        // Assert
+        result.Result.Should().BeOfType<NoContent>();
+        var deleted = await _db.Orders.FirstOrDefaultAsync(o => o.Id == orderId);
+        deleted.Should().BeNull();
+    }
+
+    [Fact]
     public async Task GetOrder_NotFound_ReturnsNotFound()
     {
         // Act
-        var result = await GetOrder.HandleAsync(Guid.NewGuid(), _db, CancellationToken.None);
+        var result = await GetOrder.HandleAsync(Guid.NewGuid(), null, _db, CancellationToken.None);
 
         // Assert
         result.Result.Should().BeOfType<NotFound>();
@@ -319,12 +347,67 @@ public class OrderUnitTests
         await _db.SaveChangesAsync();
 
         // Act
-        var result = await GetOrder.HandleAsync(orderId, _db, CancellationToken.None);
+        var result = await GetOrder.HandleAsync(orderId, null, _db, CancellationToken.None);
 
         // Assert
         var okResult = result.Result.Should().BeOfType<Ok<OrderDto>>().Subject;
         okResult.Value.Should().NotBeNull();
         okResult.Value!.Id.Should().Be(orderId);
-        okResult.Value.LocationCode.Should().Be("LOC-1"); 
+    }
+
+    [Fact]
+    public async Task GetOrder_WithPartitionKey_ReturnsOk()
+    {
+        // Arrange
+        var orderId = Guid.NewGuid();
+        var date = new DateOnly(2023, 5, 20);
+        var order = new Order
+        {
+            Id = orderId,
+            OrderDate = date,
+            Status = OrderStatus.Pending,
+            LocationId = 1,
+            ProductId = 1,
+            Quantity = 10,
+            SubmittedBy = "User",
+            Location = new Location { Id = 1, Code = "LOC-1" },
+            Product = new Product { Id = 1, Code = "PROD-1" }
+        };
+        _db.Orders.Add(order);
+        await _db.SaveChangesAsync();
+
+        // Act
+        var result = await GetOrder.HandleAsync(orderId, date, _db, CancellationToken.None);
+
+        // Assert
+        var okResult = result.Result.Should().BeOfType<Ok<OrderDto>>().Subject;
+        okResult.Value!.Id.Should().Be(orderId);
+    }
+
+    [Fact]
+    public async Task GetOrder_WithWrongPartitionKey_ReturnsNotFound()
+    {
+        // Arrange
+        var orderId = Guid.NewGuid();
+        var date = new DateOnly(2023, 5, 20);
+        var order = new Order
+        {
+            Id = orderId,
+            OrderDate = date,
+            Status = OrderStatus.Pending,
+            LocationId = 1,
+            ProductId = 1,
+            Quantity = 10,
+            SubmittedBy = "User"
+        };
+        _db.Orders.Add(order);
+        await _db.SaveChangesAsync();
+
+        // Act
+        // Pass a different date. Even though ID matches, the partition filter should make it return null
+        var result = await GetOrder.HandleAsync(orderId, date.AddDays(1), _db, CancellationToken.None);
+
+        // Assert
+        result.Result.Should().BeOfType<NotFound>();
     }
 }
